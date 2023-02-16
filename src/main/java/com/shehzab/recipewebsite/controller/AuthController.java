@@ -1,65 +1,49 @@
 package com.shehzab.recipewebsite.controller;
 
-import com.shehzab.recipewebsite.model.LoginPojo;
-import com.shehzab.recipewebsite.model.RegisterUser;
-import com.shehzab.recipewebsite.repository.UsersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.shehzab.recipewebsite.model.AuthenticationRequest;
+import com.shehzab.recipewebsite.model.RegisterRequest;
+import com.shehzab.recipewebsite.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    UsersRepository usersRepository;
-
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterUser registerUser) {
-        try {
-            var userExist = usersRepository.findByEmail(registerUser.getEmail());
-            if (userExist != null) {
-                return ResponseEntity.status(400).body("Email already exist");
-            }
-            registerUser.setPassword(passwordEncoder.encode(registerUser.getPassword()));
-            registerUser.setCreated(new Date());
-            usersRepository.save(registerUser);
-            return ResponseEntity.ok(registerUser);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage());
-        }
-    }
+    private final AuthService authService;
 
     @GetMapping("/emailValidation")
     public ResponseEntity<?> checkEmailExist(@RequestParam(name = "email") String email) {
-        if (email == null) {
-            return ResponseEntity.status(400).body("param is missing");
+        if (authService.isEmailExist(email)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        var userEmail = usersRepository.findByEmail(email);
-        if (userEmail == null) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.status(409).body("email already exist");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginPojo loginPojo) {
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
         try {
-            var user = usersRepository.findByEmail(loginPojo.email());
-            if (user != null) {
-                if (passwordEncoder.matches(loginPojo.password(), user.getPassword())) {
-                    return ResponseEntity.ok("valid user");
-                }
-            }
-            return ResponseEntity.status(401).body("invalid credentials");
+            return ResponseEntity.ok(authService.register(registerRequest));
+        } catch (HttpClientErrorException ex) {
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getStatusText());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
+        try {
+            return ResponseEntity.ok(authService.authenticate(authenticationRequest));
+        } catch (Exception e) {
+            if ("Bad credentials".equals(e.getMessage())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }
