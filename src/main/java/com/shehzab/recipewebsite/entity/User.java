@@ -30,6 +30,8 @@ public class User implements UserDetails {
     private String password;
     private Date created;
 
+    @OneToMany(mappedBy = "user")
+    private List<Recipe> recipe;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

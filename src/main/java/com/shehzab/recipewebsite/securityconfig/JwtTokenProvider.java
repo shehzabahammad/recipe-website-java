@@ -54,7 +54,7 @@ public class JwtTokenProvider {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         try {
             return Jwts
                     .parserBuilder()

@@ -1,5 +1,6 @@
 package com.shehzab.recipewebsite.securityconfig;
 
+import com.shehzab.recipewebsite.constant.Constants;
 import com.shehzab.recipewebsite.repository.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader(Constants.AUTHORIZATION);
         final String jwt;
         final String userEmail;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
