@@ -60,4 +60,17 @@ public class RecipeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{recipeId}")
+    public ResponseEntity<?> deleteRecipeId(@PathVariable long recipeId, HttpServletRequest httpServletRequest) {
+        try {
+            var authToken = httpServletRequest.getHeader(Constants.AUTHORIZATION).substring(7);
+            recipeService.deleteRecipeId(recipeId, authToken);
+            return ResponseEntity.ok().build();
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }

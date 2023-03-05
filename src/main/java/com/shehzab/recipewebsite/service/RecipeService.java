@@ -106,4 +106,19 @@ public class RecipeService {
         }
         throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
     }
+
+    public void deleteRecipeId(long recipeId, String authToken) {
+        var username = jwtTokenProvider.extractAllClaims(authToken).getSubject();
+        var user = usersRepository.findByEmail(username);
+        var recipeOwner = recipeRepository.findById(recipeId);
+        if (recipeOwner.isPresent()) {
+            if (recipeOwner.get().getUser().getId() == user.getId()) {
+                recipeRepository.deleteById(recipeId);
+                return;
+            }
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+        }
+        throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+    }
+
 }
