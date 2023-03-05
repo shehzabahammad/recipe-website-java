@@ -1,7 +1,6 @@
 package com.shehzab.recipewebsite.service;
 
 import com.shehzab.recipewebsite.entity.Recipe;
-import com.shehzab.recipewebsite.entity.User;
 import com.shehzab.recipewebsite.model.RecipeRequest;
 import com.shehzab.recipewebsite.model.RecipeResponse;
 import com.shehzab.recipewebsite.repository.RecipeRepository;
