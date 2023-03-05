@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 @RequestMapping("/api/v1/recipe")
@@ -31,6 +32,30 @@ public class RecipeController {
         try {
             var authToken = httpServletRequest.getHeader(Constants.AUTHORIZATION).substring(7);
             return ResponseEntity.ok(recipeService.getAllRecipes(authToken));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{recipeId}")
+    public ResponseEntity<?> getRecipeById(@PathVariable long recipeId, HttpServletRequest httpServletRequest) {
+        try {
+            var authToken = httpServletRequest.getHeader(Constants.AUTHORIZATION).substring(7);
+            return ResponseEntity.ok(recipeService.getRecipeById(recipeId, authToken));
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{recipeId}")
+    public ResponseEntity<?> editRecipeId(@PathVariable long recipeId, @RequestBody RecipeRequest recipeRequest, HttpServletRequest httpServletRequest) {
+        try {
+            var authToken = httpServletRequest.getHeader(Constants.AUTHORIZATION).substring(7);
+            return ResponseEntity.ok(recipeService.editRecipeById(recipeId, recipeRequest, authToken));
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
