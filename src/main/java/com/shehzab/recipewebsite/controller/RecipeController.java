@@ -38,7 +38,7 @@ public class RecipeController {
     }
 
     @GetMapping("/{recipeId}")
-    public ResponseEntity<?> getRecipeById(@PathVariable long recipeId, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> getRecipeById(@PathVariable String recipeId, HttpServletRequest httpServletRequest) {
         try {
             var authToken = httpServletRequest.getHeader(Constants.AUTHORIZATION).substring(7);
             return ResponseEntity.ok(recipeService.getRecipeById(recipeId, authToken));
@@ -50,7 +50,7 @@ public class RecipeController {
     }
 
     @PutMapping("/{recipeId}")
-    public ResponseEntity<?> editRecipeId(@PathVariable long recipeId, @RequestBody RecipeRequest recipeRequest, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> editRecipeId(@PathVariable String recipeId, @RequestBody RecipeRequest recipeRequest, HttpServletRequest httpServletRequest) {
         try {
             var authToken = httpServletRequest.getHeader(Constants.AUTHORIZATION).substring(7);
             return ResponseEntity.ok(recipeService.editRecipeById(recipeId, recipeRequest, authToken));
@@ -62,7 +62,7 @@ public class RecipeController {
     }
 
     @DeleteMapping("/{recipeId}")
-    public ResponseEntity<?> deleteRecipeId(@PathVariable long recipeId, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> deleteRecipeId(@PathVariable String recipeId, HttpServletRequest httpServletRequest) {
         try {
             var authToken = httpServletRequest.getHeader(Constants.AUTHORIZATION).substring(7);
             recipeService.deleteRecipeId(recipeId, authToken);

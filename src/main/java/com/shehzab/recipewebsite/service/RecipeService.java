@@ -13,6 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class RecipeService {
                 .ingredients(recipe.getIngredients())
                 .making(recipe.getMaking())
                 .specialNotes(recipe.getSpecialNotes())
-                .owner(true)
+                .isOwner(true)
                 .build();
     }
 
@@ -55,13 +56,13 @@ public class RecipeService {
                     .ingredients(recipe.getIngredients())
                     .making(recipe.getMaking())
                     .specialNotes(recipe.getSpecialNotes())
-                    .owner(recipe.getUser().getId() == user.getId())
+                    .isOwner(recipe.getUser().getId() == user.getId())
                     .build());
         }
         return responseList;
     }
 
-    public RecipeResponse getRecipeById(long recipeId, String authToken) throws HttpClientErrorException {
+    public RecipeResponse getRecipeById(String recipeId, String authToken) throws HttpClientErrorException {
         var username = jwtTokenProvider.extractAllClaims(authToken).getSubject();
         var user = usersRepository.findByEmail(username);
         var recipe = recipeRepository.findById(recipeId);
@@ -72,18 +73,18 @@ public class RecipeService {
                     .ingredients(recipe.get().getIngredients())
                     .making(recipe.get().getMaking())
                     .specialNotes(recipe.get().getSpecialNotes())
-                    .owner(recipe.get().getUser().getId() == user.getId())
+                    .isOwner(recipe.get().getUser().getId() == user.getId())
                     .build();
         }
         throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
     }
 
-    public RecipeResponse editRecipeById(long recipeId, RecipeRequest recipeRequest, String authToken) throws HttpClientErrorException {
+    public RecipeResponse editRecipeById(String recipeId, RecipeRequest recipeRequest, String authToken) throws HttpClientErrorException {
         var username = jwtTokenProvider.extractAllClaims(authToken).getSubject();
         var user = usersRepository.findByEmail(username);
         var recipeOwner = recipeRepository.findById(recipeId);
         if (recipeOwner.isPresent()) {
-            if (recipeOwner.get().getUser().getId() == user.getId()) {
+            if (Objects.equals(recipeOwner.get().getUser().getId(), user.getId())) {
                 var recipe = Recipe.builder()
                         .title(recipeRequest.getTitle())
                         .ingredients(recipeRequest.getIngredients())
@@ -106,7 +107,7 @@ public class RecipeService {
         throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
     }
 
-    public void deleteRecipeId(long recipeId, String authToken) {
+    public void deleteRecipeId(String recipeId, String authToken) {
         var username = jwtTokenProvider.extractAllClaims(authToken).getSubject();
         var user = usersRepository.findByEmail(username);
         var recipeOwner = recipeRepository.findById(recipeId);

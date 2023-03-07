@@ -9,12 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecipeResponse {
+public class ProfileRequest {
 
-    private String recipeId;
-    private String title;
-    private String ingredients;
-    private String making;
-    private String specialNotes;
-    private boolean isOwner;
+    private String firstName;
+    private String lastName;
+
 }

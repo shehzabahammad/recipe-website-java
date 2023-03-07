@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 public class Recipe {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long Id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String Id;
     @Column(name = "title")
     private String title;
     @Column(name = "ingredients")
